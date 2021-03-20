@@ -9,7 +9,7 @@ namespace DiscordBotEthan.Commands {
     public class Tag : BaseCommandModule {
 
         [Command("Tag"), Description("Requests a Tag")]
-        public async Task TagCommand(CommandContext ctx, [Description("`highlighting`,`slashcommands`")] string tagtoshow) {
+        public async Task TagCommand(CommandContext ctx, [Description("`highlighting`,`slashcommands`,`lpbaseofdll`,`learnpython`")] string tagtoshow) {
             switch (tagtoshow.ToLower()) {
                 case "highlighting": {
                         DiscordEmbedBuilder Tags = new DiscordEmbedBuilder {
@@ -65,8 +65,41 @@ would be
                         break;
                     }
 
+                case "lpbaseofdll": {
+                        DiscordEmbedBuilder Tags = new DiscordEmbedBuilder {
+                            Title = "Tag | lpBaseOfDll",
+                            Description = @"There has been trouble coping Code and not listining to Ethan, copy this exact string
+`lpBaseOfDll`",
+                            Color = Program.EmbedColor,
+                            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
+                            Timestamp = DateTimeOffset.Now
+                        };
+                        await ctx.RespondAsync(embed: Tags);
+                        break;
+                    }
+
+                case "learnpython": {
+                        DiscordEmbedBuilder Tags = new DiscordEmbedBuilder {
+                            Title = "Tag | Learn Python",
+                            Description = @"We don't spoonfeed.
+
+You need to atleast learn basics of Python (arrays, for/while loops, etc.)
+
+Starting page to Python and Programming with it itself:
+https://www.python.org/about/gettingstarted/
+
+Website for learning Python for free:
+https://www.learnpython.org/",
+                            Color = Program.EmbedColor,
+                            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
+                            Timestamp = DateTimeOffset.Now
+                        };
+                        await ctx.RespondAsync(embed: Tags);
+                        break;
+                    }
+
                 default:
-                    throw new ArgumentNullException();
+                    throw new ArgumentException("Tag not found", "tagtoshow");
             }
         }
     }
