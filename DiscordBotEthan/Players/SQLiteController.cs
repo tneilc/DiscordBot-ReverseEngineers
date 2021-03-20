@@ -13,7 +13,6 @@ namespace DiscordBotEthan.Players {
 
         public struct Player {
             public ulong ID { get; set; }
-            public List<string> LastMessages { get; set; }
             public List<string> Warns { get; set; }
             public bool Muted { get; set; }
 
@@ -32,13 +31,11 @@ namespace DiscordBotEthan.Players {
             }
 
             long IDc = output.ID;
-            string LastMessages = output.LastMessages;
             string Warns = output.Warns;
             long Muted = output.Muted;
 
             Player player = new Player {
                 ID = (ulong)IDc,
-                LastMessages = string.IsNullOrEmpty(LastMessages) ? new List<string>() : LastMessages.Split(",").ToList(),
                 Warns = string.IsNullOrEmpty(Warns) ? new List<string>() : Warns.Split(",").ToList(),
                 Muted = Convert.ToBoolean(Muted)
             };
@@ -51,11 +48,10 @@ namespace DiscordBotEthan.Players {
             using IDbConnection cnn = new SQLiteConnection(ConnString);
             var args = new Dictionary<string, object>{
                 {"@id", player.ID},
-                {"@lastmessages", string.Join(",", player.LastMessages)},
                 {"@warns", string.Join(",", player.Warns)},
                 {"@muted", player.Muted}
             };
-            await cnn.ExecuteAsync($"UPDATE Players SET LastMessages=@lastmessages, Warns=@warns, Muted=@muted WHERE ID=@id", args).ConfigureAwait(false);
+            await cnn.ExecuteAsync($"UPDATE Players SET Warns=@warns, Muted=@muted WHERE ID=@id", args).ConfigureAwait(false);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using DSharpPlus.Entities;
 using JokinsCommon;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -122,22 +123,28 @@ namespace DiscordBotEthan {
             return Task.CompletedTask;
         }
 
+        private static Dictionary<ulong, List<string>> UsersLastMessages = new Dictionary<ulong, List<string>>();
+
         public static Task Discord_MessageCreated(DiscordClient sender, DSharpPlus.EventArgs.MessageCreateEventArgs args) {
             _ = Task.Run(async () => {
                 if (args.Author.IsBot)
                     return;
 
                 var PS = await new Players.SQLiteController().GetPlayer(args.Author.Id);
-                if (PS.LastMessages.Count > 1 && PS.LastMessages.Contains(args.Message.Content)) {
+
+                if (!UsersLastMessages.ContainsKey(args.Author.Id)) {
+                    UsersLastMessages.Add(args.Author.Id, new List<string>());
+                } else if (UsersLastMessages[args.Author.Id].Count > 1 && UsersLastMessages[args.Author.Id].Contains(args.Message.Content)) {
                     await Misc.Warn(args.Channel, args.Author, "Spamming");
                     PS.Warns.Add("Spamming");
-                    PS.LastMessages.Clear();
-                } else if (PS.LastMessages.Contains(args.Message.Content)) {
-                    PS.LastMessages.Add(args.Message.Content);
+                    UsersLastMessages[args.Author.Id].Clear();
+                } else if (UsersLastMessages[args.Author.Id].Contains(args.Message.Content)) {
+                    UsersLastMessages[args.Author.Id].Add(args.Message.Content);
                 } else {
-                    PS.LastMessages.Clear();
-                    PS.LastMessages.Add(args.Message.Content);
+                    UsersLastMessages[args.Author.Id].Clear();
+                    UsersLastMessages[args.Author.Id].Add(args.Message.Content);
                 }
+
                 await PS.Save();
 
                 if (new Random().Next(500) == 1) {
