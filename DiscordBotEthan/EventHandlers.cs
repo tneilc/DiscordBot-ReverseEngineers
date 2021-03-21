@@ -123,7 +123,7 @@ namespace DiscordBotEthan {
             return Task.CompletedTask;
         }
 
-        private static Dictionary<ulong, List<string>> UsersLastMessages = new Dictionary<ulong, List<string>>();
+        private static readonly Dictionary<ulong, List<string>> UsersLastMessages = new Dictionary<ulong, List<string>>();
 
         public static Task Discord_MessageCreated(DiscordClient sender, DSharpPlus.EventArgs.MessageCreateEventArgs args) {
             _ = Task.Run(async () => {
