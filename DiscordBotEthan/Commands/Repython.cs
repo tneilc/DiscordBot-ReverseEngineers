@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace DiscordBotEthan.Commands {
 
     public class Repython : BaseCommandModule {
-        private readonly string[] BlacklistedCode = { "os", "socket", "importlib", "sys", "subprocess", "asyncore", "hostname", "ping", "shutdown", "system" };
+        private readonly string[] BlacklistedCode = { "os", "socket", "importlib", "sys", "subprocess", "asyncore", "hostname", "ping", "shutdown", "system", "__import__", "eval" };
 
         [Command("Repython"), Cooldown(2, 10, CooldownBucketType.User), RequireRoles(RoleCheckMode.Any, "coder", "C# Global Elite"), Hidden]
         public async Task RepythonCommand(CommandContext ctx, [RemainingText] string code) {
