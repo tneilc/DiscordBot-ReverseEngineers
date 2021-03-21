@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,6 +20,63 @@ namespace DiscordBotEthan.Players {
 
             internal async Task Save() {
                 await new SQLiteController().Save(this);
+            }
+
+            internal async Task Warn(DiscordChannel channel, string reason = "No reason specified") {
+                DiscordGuild Guild = await discord.GetGuildAsync(GuildID);
+                DiscordMember Member = await Guild.GetMemberAsync(ID);
+
+
+                DiscordEmbedBuilder WarnMessage = new DiscordEmbedBuilder {
+                    Title = $"Warns | {Member.Username}",
+                    Description = $"**{Member.Mention} has been warned for the following Reason:**\n{reason}\n**Muted: False**",
+                    Color = EmbedColor,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
+                    Timestamp = DateTimeOffset.Now
+                };
+
+                if ((Warns.Count + 1) >= 3) {
+                    if (!Muted) {
+                        var SQLC = new SQLiteController();
+
+                        DateTime MuteTime = DateTime.Now.AddHours(1);
+                        DiscordRole MutedRole = Guild.GetRole(Program.MutedRole);
+
+                        await Member.GrantRoleAsync(MutedRole);
+                        await SQLC.AddTempmute((long)Member.Id, MuteTime.ToBinary());
+
+                        Muted = true;
+
+                        WarnMessage.WithDescription($"**{Member.Mention} has been warned for the following Reason:**\n{reason}\n**Muted: True\nUnmuted on {MuteTime:dd.MM.yyyy HH:mm}**");
+
+                        _ = Task.Run(async () => {
+                            try {
+                                await Task.Delay(86400000);
+
+                                var SQLC = new SQLiteController();
+                                DiscordGuild Guild = await discord.GetGuildAsync(GuildID);
+                                DiscordRole MutedRole = Guild.GetRole(Program.MutedRole);
+
+                                var PS = await SQLC.GetPlayer(Member.Id);
+                                PS.Muted = false;
+                                await PS.Save();
+
+                                await SQLC.DeleteTempmutesWithID((long)Member.Id);
+                                await Member.RevokeRoleAsync(MutedRole);
+                            } catch (Exception) {
+                                discord.Logger.LogInformation($"Failed the Warn Tempmute process for {Member.Username + "#" + Member.Discriminator}");
+                            }
+
+                        });
+                    } else {
+                        WarnMessage.WithDescription($"**{Member.Mention} has been warned for the following Reason:**\n{reason}\n**Muted: Already muted**");
+                    }
+ 
+                }
+
+                var msg = await channel.SendMessageAsync(WarnMessage);
+
+                Warns.Add($"{reason} | [Event]({msg.JumpLink})");
             }
         }
 
