@@ -135,8 +135,7 @@ namespace DiscordBotEthan {
                 if (!UsersLastMessages.ContainsKey(args.Author.Id)) {
                     UsersLastMessages.Add(args.Author.Id, new List<string>());
                 } else if (UsersLastMessages[args.Author.Id].Count > 1 && UsersLastMessages[args.Author.Id].Contains(args.Message.Content)) {
-                    await Misc.Warn(args.Channel, args.Author, "Spamming");
-                    PS.Warns.Add("Spamming");
+                    await PS.Warn(args.Channel, "Spamming");
                     UsersLastMessages[args.Author.Id].Clear();
                 } else if (UsersLastMessages[args.Author.Id].Contains(args.Message.Content)) {
                     UsersLastMessages[args.Author.Id].Add(args.Message.Content);
@@ -144,8 +143,6 @@ namespace DiscordBotEthan {
                     UsersLastMessages[args.Author.Id].Clear();
                     UsersLastMessages[args.Author.Id].Add(args.Message.Content);
                 }
-
-                await PS.Save();
 
                 if (new Random().Next(500) == 1) {
                     using WebClient client = new WebClient();
@@ -162,23 +159,25 @@ namespace DiscordBotEthan {
                     foreach (var attach in args.Message.Attachments) {
                         if (attach.FileName.EndsWith("exe")) {
                             await args.Message.DeleteAsync("EXE File");
-                            await Misc.Warn(args.Channel, args.Author, "Uploading a EXE File");
+                            await PS.Warn(args.Channel, "Uploading a EXE File");
                         } else if (attach.FileName.EndsWith("dll")) {
                             await args.Message.DeleteAsync("DLL File");
-                            await Misc.Warn(args.Channel, args.Author, "Uploading a DLL File");
+                            await PS.Warn(args.Channel,  "Uploading a DLL File");
                         }
                     }
                 } else if (stripped.Contains("discordgg")) {
                     await args.Message.DeleteAsync();
-                    await Misc.Warn(args.Channel, args.Author, "Invite Link");
+                    await PS.Warn(args.Channel, "Invite Link");
                 } else if (stripped.Contains("nigger") || stripped.Contains("nigga")) {
-                    await Misc.Warn(args.Channel, args.Author, "Saying the N-Word");
+                    await PS.Warn(args.Channel, "Saying the N-Word");
 
                     await new DiscordMessageBuilder()
                         .WithContent("Keep up the racism and you will get banned\nUse nig, nibba instead atleast")
                         .WithReply(args.Message.Id, true)
                         .SendAsync(args.Channel);
                 }
+
+                await PS.Save();
             });
 
             return Task.CompletedTask;
