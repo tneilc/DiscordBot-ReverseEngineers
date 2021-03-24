@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static DiscordBotEthan.Program;
 
+
 namespace DiscordBotEthan.Players {
 
     public class SQLiteController {
@@ -82,11 +83,11 @@ namespace DiscordBotEthan.Players {
 
         public async Task<Player> GetPlayer(ulong ID) {
             using IDbConnection cnn = new SQLiteConnection(ConnString);
-            var output = await cnn.QuerySingleOrDefaultAsync($"SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
+            var output = await cnn.QuerySingleOrDefaultAsync("SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
 
             if (output == null) {
                 await cnn.ExecuteAsync($"INSERT INTO Players (ID) VALUES (@id)", new { id = ID }).ConfigureAwait(false);
-                output = await cnn.QuerySingleOrDefaultAsync($"SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
+                output = await cnn.QuerySingleOrDefaultAsync("SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
             }
 
             long IDc = output.ID;

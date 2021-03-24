@@ -32,7 +32,7 @@ namespace DiscordBotEthan.Commands {
                 await ctx.RespondAsync($"Something doesn't seem right.. <@{Program.BotOwner}> verify this");
 
                 var msg = await ctx.Channel.GetNextMessageAsync(x => x.Author.Id == Program.BotOwner);
-                if (msg.Result.Content.ToLower() != "verified" || msg.TimedOut) {
+                if (!string.Equals(msg.Result.Content, "verified", StringComparison.OrdinalIgnoreCase) || msg.TimedOut) {
                     await ctx.RespondAsync("Bot Owner didn't verify of execution");
                     return;
                 }

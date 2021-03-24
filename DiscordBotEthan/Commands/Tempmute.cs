@@ -25,8 +25,9 @@ namespace DiscordBotEthan.Commands {
 
             PS.Muted = true;
             await PS.Save();
+
             await member.GrantRoleAsync(MutedRole);
-            await SQLC.AddTempmute((long)ctx.Member.Id, dateTime.ToBinary());
+            await SQLC.AddTempmute((long)member.Id, dateTime.ToBinary());
 
             DiscordEmbedBuilder TempMute = new DiscordEmbedBuilder {
                 Title = $"TempMute | {member.Username}",
