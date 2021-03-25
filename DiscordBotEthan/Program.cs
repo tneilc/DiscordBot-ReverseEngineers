@@ -23,6 +23,8 @@ namespace DiscordBotEthan {
         public static readonly string[] Statuses = { "Allah is watchin", "Despacito", "Fuck", "Janitor cleanup", "CSGO and Cheating", "EAC Bypass" };
         public static DiscordClient discord;
         public static DiscordColor EmbedColor = new DiscordColor("#3299E0");
+        public static Players.SQLiteController SQLC = new Players.SQLiteController();
+
         private static void Main() {
             Console.WriteLine("Starting Checks");
 

@@ -15,8 +15,7 @@ namespace DiscordBotEthan.Commands {
             DateTime dateTime = DateTime.Now.AddMilliseconds(Time);
             DiscordRole MutedRole = ctx.Guild.GetRole(Program.MutedRole);
 
-            var SQLC = new Players.SQLiteController();
-            var PS = await SQLC.GetPlayer(member.Id);
+            var PS = await Program.SQLC.GetPlayer(member.Id);
 
             if (PS.Muted) {
                 await ctx.RespondAsync("That Member is already muted");
@@ -27,7 +26,7 @@ namespace DiscordBotEthan.Commands {
             await PS.Save();
 
             await member.GrantRoleAsync(MutedRole);
-            await SQLC.AddTempmute((long)member.Id, dateTime.ToBinary());
+            await Program.SQLC.AddTempmute((long)member.Id, dateTime.ToBinary());
 
             DiscordEmbedBuilder TempMute = new DiscordEmbedBuilder {
                 Title = $"TempMute | {member.Username}",
@@ -42,11 +41,11 @@ namespace DiscordBotEthan.Commands {
                 try {
                     await Task.Delay((int)Time);
 
-                    var PS = await SQLC.GetPlayer(member.Id);
+                    var PS = await Program.SQLC.GetPlayer(member.Id);
                     PS.Muted = false;
 
                     await PS.Save();
-                    await SQLC.DeleteTempmutesWithID((long)member.Id);
+                    await Program.SQLC.DeleteTempmutesWithID((long)member.Id);
                     await member.RevokeRoleAsync(MutedRole);
                 } catch (Exception) {
                     ctx.Client.Logger.LogInformation($"Failed the Tempmute process for {ctx.Member.Username + ctx.Member.Discriminator}");

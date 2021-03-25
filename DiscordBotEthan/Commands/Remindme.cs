@@ -15,8 +15,7 @@ namespace DiscordBotEthan.Commands {
             double Time = JokinsCommon.Methods.TimeConverter(When);
             DateTime dateTime = DateTime.Now.AddMilliseconds(Time);
 
-            var SQLC = new Players.SQLiteController();
-            var output = await SQLC.GetRemindersWithID((long)ctx.Member.Id);
+            var output = await Program.SQLC.GetRemindersWithID((long)ctx.Member.Id);
 
             if (output.Count() == 1) {
                 await ctx.RespondAsync("You already have a Reminder running");
@@ -32,20 +31,19 @@ namespace DiscordBotEthan.Commands {
             };
             await ctx.RespondAsync(embed: Reminder);
 
-            await SQLC.AddReminder((long)ctx.Member.Id, (long)ctx.Channel.Id, dateTime.ToBinary(), What);
+            await Program.SQLC.AddReminder((long)ctx.Member.Id, (long)ctx.Channel.Id, dateTime.ToBinary(), What);
 
             _ = Task.Run(async () => {
                 await Task.Delay((int)Time);
 
                 await ctx.RespondAsync($":alarm_clock:, {ctx.Member.Mention} you wanted me to remind you the following:\n\n{What}");
-                await SQLC.DeleteRemindersWithDate(dateTime.ToBinary());
+                await Program.SQLC.DeleteRemindersWithDate(dateTime.ToBinary());
             });
         }
 
         [Command("clear"), Cooldown(1, 20, CooldownBucketType.User), Description("Clear your Reminders")]
         public async Task ClearCommand(CommandContext ctx) {
-            var SQLC = new Players.SQLiteController();
-            await SQLC.DeleteRemindersWithID((long)ctx.Member.Id);
+            await Program.SQLC.DeleteRemindersWithID((long)ctx.Member.Id);
 
             DiscordEmbedBuilder Reminder = new DiscordEmbedBuilder {
                 Title = $"Reminder | {ctx.Member.Username}",
@@ -62,8 +60,6 @@ namespace DiscordBotEthan.Commands {
             double Time = JokinsCommon.Methods.TimeConverter(When);
             DateTime dateTime = DateTime.Now.AddMilliseconds(Time);
 
-            var SQLC = new Players.SQLiteController();
-
             DiscordEmbedBuilder Reminder = new DiscordEmbedBuilder {
                 Title = $"Reminder | {member.Username}",
                 Description = $"**Ok, I will remind him the following on {dateTime:dd.MM.yyyy HH:mm}:**\n{What}",
@@ -73,13 +69,13 @@ namespace DiscordBotEthan.Commands {
             };
             await ctx.RespondAsync(embed: Reminder);
 
-            await SQLC.AddReminder((long)member.Id, (long)ctx.Channel.Id, dateTime.ToBinary(), What);
+            await Program.SQLC.AddReminder((long)member.Id, (long)ctx.Channel.Id, dateTime.ToBinary(), What);
 
             _ = Task.Run(async () => {
                 await Task.Delay((int)Time);
 
                 await ctx.RespondAsync($":alarm_clock:, {member.Mention} someone wanted me to remind you the following:\n\n{What}");
-                await SQLC.DeleteRemindersWithDate(dateTime.ToBinary());
+                await Program.SQLC.DeleteRemindersWithDate(dateTime.ToBinary());
             });
         }
     }

@@ -13,7 +13,7 @@
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc2" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-rc2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.10.0-1.final" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Data.SQLClient" Version="4.8.2" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.7" />
   </ItemGroup>
 
