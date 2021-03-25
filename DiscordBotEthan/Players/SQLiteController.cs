@@ -19,13 +19,12 @@ namespace DiscordBotEthan.Players {
             public bool Muted { get; set; }
 
             internal async Task Save() {
-                await new SQLiteController().Save(this);
+                await SQLC.Save(this).ConfigureAwait(false);
             }
 
             internal async Task Warn(DiscordChannel channel, string reason = "No reason specified") {
                 DiscordGuild Guild = await discord.GetGuildAsync(GuildID);
                 DiscordMember Member = await Guild.GetMemberAsync(ID);
-
 
                 DiscordEmbedBuilder WarnMessage = new DiscordEmbedBuilder {
                     Title = $"Warns | {Member.Username}",
@@ -37,8 +36,6 @@ namespace DiscordBotEthan.Players {
 
                 if ((Warns.Count + 1) >= 3) {
                     if (!Muted) {
-                        var SQLC = new SQLiteController();
-
                         DateTime MuteTime = DateTime.Now.AddHours(1);
                         DiscordRole MutedRole = Guild.GetRole(Program.MutedRole);
 
@@ -53,7 +50,6 @@ namespace DiscordBotEthan.Players {
                             try {
                                 await Task.Delay(86400000);
 
-                                var SQLC = new SQLiteController();
                                 DiscordGuild Guild = await discord.GetGuildAsync(GuildID);
                                 DiscordRole MutedRole = Guild.GetRole(Program.MutedRole);
 
@@ -61,17 +57,15 @@ namespace DiscordBotEthan.Players {
                                 PS.Muted = false;
                                 await PS.Save();
 
-                                await SQLC.DeleteTempmutesWithID((long)Member.Id);
+                                await Program.SQLC.DeleteTempmutesWithID((long)Member.Id);
                                 await Member.RevokeRoleAsync(MutedRole);
                             } catch (Exception) {
                                 discord.Logger.LogInformation($"Failed the Warn Tempmute process for {Member.Username + "#" + Member.Discriminator}");
                             }
-
                         });
                     } else {
                         WarnMessage.WithDescription($"**{Member.Mention} has been warned for the following Reason:**\n{reason}\n**Muted: Already muted**");
                     }
- 
                 }
 
                 var msg = await channel.SendMessageAsync(WarnMessage);
@@ -82,11 +76,11 @@ namespace DiscordBotEthan.Players {
 
         public async Task<Player> GetPlayer(ulong ID) {
             using IDbConnection cnn = new SQLiteConnection(ConnString);
-            var output = await cnn.QuerySingleOrDefaultAsync($"SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
+            var output = await cnn.QuerySingleOrDefaultAsync("SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
 
             if (output == null) {
                 await cnn.ExecuteAsync($"INSERT INTO Players (ID) VALUES (@id)", new { id = ID }).ConfigureAwait(false);
-                output = await cnn.QuerySingleOrDefaultAsync($"SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
+                output = await cnn.QuerySingleOrDefaultAsync("SELECT * FROM Players WHERE ID=@id", new { id = ID }).ConfigureAwait(false);
             }
 
             long IDc = output.ID;
@@ -100,7 +94,6 @@ namespace DiscordBotEthan.Players {
             };
 
             return player;
-
         }
 
         public async Task Save(Player player) {

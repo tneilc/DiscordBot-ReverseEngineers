@@ -11,7 +11,7 @@ namespace DiscordBotEthan.Commands {
 
         [GroupCommand, Description("Shows all warns for said Member")]
         public async Task WarnsShowCommand(CommandContext ctx, [Description("The Member as Mention or ID/Username")] DiscordMember member) {
-            var PS = await new Players.SQLiteController().GetPlayer(member.Id);
+            var PS = await Program.SQLC.GetPlayer(member.Id);
 
             DiscordEmbedBuilder Warns = new DiscordEmbedBuilder {
                 Title = $"Warns | {member.Username}",
@@ -25,7 +25,7 @@ namespace DiscordBotEthan.Commands {
 
         [Command("clear"), Description("Clears all warns for said Member"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public async Task ClearCommand(CommandContext ctx, [Description("The Member as Mention or ID/Username")] DiscordMember member) {
-            var PS = await new Players.SQLiteController().GetPlayer(member.Id);
+            var PS = await Program.SQLC.GetPlayer(member.Id);
             PS.Warns.Clear();
             await PS.Save();
 
@@ -41,7 +41,7 @@ namespace DiscordBotEthan.Commands {
 
         [Command("add"), Description("Adds a warn for said Member with a reason"), RequirePermissions(DSharpPlus.Permissions.Administrator)]
         public async Task AddCommand(CommandContext ctx, [Description("The Member as Mention or ID/Username")] DiscordMember member, [RemainingText, Description("Reason for the warn")] string reason = "No reason specified") {
-            var PS = await new Players.SQLiteController().GetPlayer(member.Id);
+            var PS = await Program.SQLC.GetPlayer(member.Id);
             await PS.Warn(ctx.Channel, reason);
             await PS.Save();
         }

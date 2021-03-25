@@ -29,7 +29,7 @@ namespace DiscordBotEthan.Commands {
             await ctx.RespondAsync("Beginning execution");
 
             try {
-                var globals = new TestVariables(ctx.Message, ctx.Client, ctx, new Players.SQLiteController());
+                var globals = new TestVariables(ctx.Message, ctx.Client, ctx, Program.SQLC);
 
                 var sopts = ScriptOptions.Default.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.CommandsNext");
                 sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
@@ -62,9 +62,9 @@ namespace DiscordBotEthan.Commands {
             public DiscordMember Member { get; set; }
             public CommandContext Context { get; set; }
 
-            public TestVariables(DiscordMessage msg, DiscordClient client, CommandContext ctx, Players.SQLiteController sqlc) {
+            public TestVariables(DiscordMessage msg, DiscordClient client, CommandContext ctx, Players.SQLiteController SQLController) {
                 Client = client;
-                SQLC = sqlc;
+                SQLC = SQLController;
 
                 Message = msg;
                 Channel = msg.Channel;

@@ -10,13 +10,12 @@ namespace DiscordBotEthan.Commands {
 
         [Command("Unmute"), Description("Unmutes a Member")]
         public async Task UnmuteCommand(CommandContext ctx, [Description("The Member to unmute")] DiscordMember member) {
-            var SQLC = new Players.SQLiteController();
-            var PS = await SQLC.GetPlayer(member.Id);
+            var PS = await Program.SQLC.GetPlayer(member.Id);
 
             PS.Muted = false;
 
             await PS.Save();
-            await SQLC.DeleteTempmutesWithID((long)member.Id);
+            await Program.SQLC.DeleteTempmutesWithID((long)member.Id);
             await member.RevokeRoleAsync(ctx.Guild.GetRole(Program.MutedRole));
 
             DiscordEmbedBuilder Unmute = new DiscordEmbedBuilder {
