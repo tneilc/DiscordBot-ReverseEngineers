@@ -28,6 +28,13 @@ namespace DiscordBotEthan.Commands {
             var cs = code[cs1..cs2];
             await ctx.RespondAsync("Beginning execution");
 
+            DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
+                Title = $"Execution | Returned",
+                Color = Program.EmbedColor,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
+                Timestamp = DateTimeOffset.Now
+            };
+
             try {
                 var globals = new TestVariables(ctx.Message, ctx.Client, ctx, Program.SQLC);
 
@@ -39,18 +46,15 @@ namespace DiscordBotEthan.Commands {
                 var result = await script.RunAsync(globals).ConfigureAwait(false);
 
                 if (result != null && result.ReturnValue != null && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString())) {
-                    DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
-                        Title = $"Execution | Returned",
-                        Description = result.ReturnValue.ToString(),
-                        Color = Program.EmbedColor,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
-                        Timestamp = DateTimeOffset.Now
-                    };
-                    await ctx.RespondAsync(embed: exec).ConfigureAwait(false);
-                } else
-                    await ctx.RespondAsync("No error but no return either").ConfigureAwait(false);
+                    exec.Description = result.ReturnValue.ToString();
+                    await ctx.RespondAsync(exec).ConfigureAwait(false);
+                } else {
+                    exec.Description = "No error but no return either";
+                    await ctx.RespondAsync(exec).ConfigureAwait(false);
+                }
             } catch (Exception ex) {
-                await ctx.RespondAsync("You fucked up\n" + string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message)).ConfigureAwait(false);
+                exec.Description = string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message);
+                await ctx.RespondAsync(exec).ConfigureAwait(false);
             }
         }
 

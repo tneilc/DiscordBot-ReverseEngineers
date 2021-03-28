@@ -28,7 +28,7 @@ namespace DiscordBotEthan.Commands {
             if (Program.BlacklistedMembers.Any(x => x == ctx.Member.Id)) {
                 await ctx.RespondAsync("You are blacklisted");
                 return;
-            } else if (BlacklistedCode.Any(x => cs.Contains(x))) {
+            } else if (BlacklistedCode.Any(x => cs.ToLower().Contains(x))) {
                 await ctx.RespondAsync($"Something doesn't seem right.. <@{Program.BotOwner}> verify this");
 
                 var msg = await ctx.Channel.GetNextMessageAsync(x => x.Author.Id == Program.BotOwner);
@@ -39,6 +39,13 @@ namespace DiscordBotEthan.Commands {
             }
 
             await ctx.RespondAsync("Beginning execution");
+
+            DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
+                Title = $"Execution | Result",
+                Color = Program.EmbedColor,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
+                Timestamp = DateTimeOffset.Now
+            };
 
             try {
                 var proc = new Process {
@@ -54,7 +61,10 @@ namespace DiscordBotEthan.Commands {
 
                 if (!proc.Start() || !proc.WaitForExit(5000)) {
                     proc.Kill();
-                    var tempmsg = await ctx.RespondAsync("Timeout");
+
+                    exec.Description = "Timeout";
+                    var tempmsg = await ctx.RespondAsync(exec);
+
                     var Jokin = await ctx.Guild.GetMemberAsync(Program.BotOwner);
                     await Jokin.SendMessageAsync("Timeout on repython command. Check\n" + tempmsg.JumpLink);
                     return;
@@ -63,20 +73,16 @@ namespace DiscordBotEthan.Commands {
                 var result = await proc.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
 
                 if (result != null && !string.IsNullOrWhiteSpace(result)) {
-                    DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
-                        Title = $"Execution | Result",
-                        Description = result,
-                        Color = Program.EmbedColor,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
-                        Timestamp = DateTimeOffset.Now
-                    };
-                    await ctx.RespondAsync(embed: exec).ConfigureAwait(false);
+                    exec.Description = result;
+                    await ctx.RespondAsync(exec).ConfigureAwait(false);
                 } else {
                     result = await proc.StandardError.ReadToEndAsync().ConfigureAwait(false);
-                    await ctx.RespondAsync(result ?? "No error but no return either").ConfigureAwait(false);
+                    exec.Description = result ?? "No error but no return either";
+                    await ctx.RespondAsync(exec).ConfigureAwait(false);
                 }
             } catch (Exception ex) {
-                await ctx.RespondAsync("You fucked up\n" + string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message)).ConfigureAwait(false);
+                exec.Description = "You fucked up\n" + string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message);
+                await ctx.RespondAsync(exec).ConfigureAwait(false);
             }
         }
     }
