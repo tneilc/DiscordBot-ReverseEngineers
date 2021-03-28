@@ -47,6 +47,7 @@ namespace DiscordBotEthan.Commands {
                         Arguments = $"-c \"{cs}\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
+                        RedirectStandardError = true,
                         CreateNoWindow = true
                     }
                 };
@@ -71,7 +72,8 @@ namespace DiscordBotEthan.Commands {
                     };
                     await ctx.RespondAsync(embed: exec).ConfigureAwait(false);
                 } else {
-                    await ctx.RespondAsync("No C# error but no result either").ConfigureAwait(false);
+                    result = await proc.StandardError.ReadToEndAsync().ConfigureAwait(false);
+                    await ctx.RespondAsync(result ?? "No error but no return either").ConfigureAwait(false);
                 }
             } catch (Exception ex) {
                 await ctx.RespondAsync("You fucked up\n" + string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message)).ConfigureAwait(false);

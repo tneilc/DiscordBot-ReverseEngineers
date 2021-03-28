@@ -62,9 +62,9 @@ namespace DiscordBotEthan.Commands {
             public DiscordMember Member { get; set; }
             public CommandContext Context { get; set; }
 
-            public TestVariables(DiscordMessage msg, DiscordClient client, CommandContext ctx, Players.SQLiteController SQLController) {
+            public TestVariables(DiscordMessage msg, DiscordClient client, CommandContext ctx, Players.SQLiteController SQLiteController) {
                 Client = client;
-                SQLC = SQLController;
+                SQLC = SQLiteController;
 
                 Message = msg;
                 Channel = msg.Channel;
