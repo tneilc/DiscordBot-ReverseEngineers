@@ -33,7 +33,7 @@ namespace DiscordBotEthan {
                             DateTime dateTime = DateTime.FromBinary(Date);
 
                             if (dateTime < DateTime.Now) {
-                                await Program.SQLC.DeleteRemindersWithDate(Date);
+                                await SQLC.DeleteRemindersWithDate(Date);
                                 await channel.SendMessageAsync($":alarm_clock:, {member.Mention} you wanted me to remind you the following but I'm Late:\n\n{Reminder}");
                                 continue;
                             }
@@ -47,10 +47,10 @@ namespace DiscordBotEthan {
 
                                 await channel.SendMessageAsync($":alarm_clock:, {member.Mention} you wanted me to remind you the following:\n\n{Reminder}");
 
-                                await Program.SQLC.DeleteRemindersWithDate(Date);
+                                await SQLC.DeleteRemindersWithDate(Date);
                             });
                         } catch (Exception) {
-                            await Program.SQLC.DeleteRemindersWithDate(Date);
+                            await SQLC.DeleteRemindersWithDate(Date);
                             continue;
                         }
                     }
@@ -60,7 +60,7 @@ namespace DiscordBotEthan {
                 }
 
                 dc.Logger.LogInformation("Looking for muted Members");
-                output = await Program.SQLC.GetTempmutes();
+                output = await SQLC.GetTempmutes();
                 if (output.Any()) {
                     foreach (var item in output) {
                         long ID = item.ID;
@@ -73,7 +73,7 @@ namespace DiscordBotEthan {
                             DateTime dateTime = DateTime.FromBinary(Date);
 
                             if (dateTime < DateTime.Now) {
-                                await Program.SQLC.DeleteTempmutesWithID(ID);
+                                await SQLC.DeleteTempmutesWithID(ID);
                                 await member.RevokeRoleAsync(MutedRole);
                                 continue;
                             }
@@ -86,18 +86,18 @@ namespace DiscordBotEthan {
                                     DiscordRole MutedRole = Guild.GetRole(Program.MutedRole);
                                     DiscordMember member = await Guild.GetMemberAsync((ulong)ID);
 
-                                    var PS = await Program.SQLC.GetPlayer(member.Id);
+                                    var PS = await SQLC.GetPlayer(member.Id);
                                     PS.Muted = false;
                                     await PS.Save();
 
                                     await member.RevokeRoleAsync(MutedRole);
-                                    await Program.SQLC.DeleteTempmutesWithID(ID);
+                                    await SQLC.DeleteTempmutesWithID(ID);
                                 } catch (Exception) {
                                     dc.Logger.LogInformation($"Failed the Tempmute process for {member.Username + member.Discriminator}");
                                 }
                             });
                         } catch (Exception) {
-                            await Program.SQLC.DeleteTempmutesWithID(ID);
+                            await SQLC.DeleteTempmutesWithID(ID);
                             continue;
                         }
                     }
@@ -128,7 +128,7 @@ namespace DiscordBotEthan {
                 if (args.Author.IsBot)
                     return;
 
-                var PS = await Program.SQLC.GetPlayer(args.Author.Id);
+                var PS = await SQLC.GetPlayer(args.Author.Id);
 
                 if (!UsersLastMessages.ContainsKey(args.Author.Id)) {
                     UsersLastMessages.Add(args.Author.Id, new List<string>());
@@ -184,14 +184,14 @@ namespace DiscordBotEthan {
         public static async Task Discord_GuildMemberAdded(DiscordClient dc, DSharpPlus.EventArgs.GuildMemberAddEventArgs args) {
             await args.Member.GrantRoleAsync(args.Guild.GetRole(LearnerRole));
 
-            var PS = await Program.SQLC.GetPlayer(args.Member.Id);
+            var PS = await SQLC.GetPlayer(args.Member.Id);
             if (PS.Muted) {
                 _ = Task.Run(async () => {
                     try {
                         DiscordRole MutedRole = args.Guild.GetRole(Program.MutedRole);
                         await args.Member.GrantRoleAsync(MutedRole);
                         await Task.Delay(86400000);
-                        var PS = await Program.SQLC.GetPlayer(args.Member.Id);
+                        var PS = await SQLC.GetPlayer(args.Member.Id);
                         PS.Muted = false;
                         await PS.Save();
                         await args.Member.RevokeRoleAsync(MutedRole);
