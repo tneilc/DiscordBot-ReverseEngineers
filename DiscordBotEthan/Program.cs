@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 namespace DiscordBotEthan {
 
     internal static class Program {
-        public static readonly ulong[] BlacklistedMembers = { 353243266579431424, 566653752451399700 };
         public static readonly ulong BotOwner = 447781010315149333;
         public static readonly string ConnString = $"Data Source={Path.Join("Players", "Players.db")}; Version=3;";
         public static readonly ulong GuildID = 732774669115064370;

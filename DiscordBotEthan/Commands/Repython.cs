@@ -12,7 +12,7 @@ namespace DiscordBotEthan.Commands {
     public class Repython : BaseCommandModule {
         private readonly string[] BlacklistedCode = { "os", "socket", "importlib", "sys", "subprocess", "asyncore", "hostname", "ping", "shutdown", "system", "__import__", "eval" };
 
-        [Command("Repython"), Cooldown(2, 10, CooldownBucketType.User), RequireRoles(RoleCheckMode.Any, "coder", "C# Global Elite"), Hidden]
+        [Command("Repython"), Blacklist(353243266579431424, 566653752451399700), Cooldown(2, 10, CooldownBucketType.User), RequireRoles(RoleCheckMode.Any, "coder", "C# Global Elite"), Hidden]
         public async Task RepythonCommand(CommandContext ctx, [RemainingText] string code) {
             var cs1 = code.IndexOf("```") + 3;
             cs1 = code.IndexOf('\n', cs1) + 1;
@@ -23,12 +23,9 @@ namespace DiscordBotEthan.Commands {
                 return;
             }
 
-            var cs = code[cs1..cs2].Replace("\"", "'");
+            code = code[cs1..cs2].Replace("\"", "'");
 
-            if (Program.BlacklistedMembers.Any(x => x == ctx.Member.Id)) {
-                await ctx.RespondAsync("You are blacklisted");
-                return;
-            } else if (BlacklistedCode.Any(x => cs.ToLower().Contains(x))) {
+            if (BlacklistedCode.Any(x => code.ToLower().Contains(x))) {
                 await ctx.RespondAsync($"Something doesn't seem right.. <@{Program.BotOwner}> verify this");
 
                 var msg = await ctx.Channel.GetNextMessageAsync(x => x.Author.Id == Program.BotOwner);
@@ -38,7 +35,7 @@ namespace DiscordBotEthan.Commands {
                 }
             }
 
-            await ctx.RespondAsync("Beginning execution");
+            var BeginMsg = await ctx.RespondAsync("Beginning execution");
 
             DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
                 Title = $"Execution | Result",
@@ -51,7 +48,7 @@ namespace DiscordBotEthan.Commands {
                 var proc = new Process {
                     StartInfo = new ProcessStartInfo {
                         FileName = "python3",
-                        Arguments = $"-c \"{cs}\"",
+                        Arguments = $"-c \"{code}\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -74,16 +71,14 @@ namespace DiscordBotEthan.Commands {
 
                 if (result != null && !string.IsNullOrWhiteSpace(result)) {
                     exec.Description = result;
-                    await ctx.RespondAsync(exec).ConfigureAwait(false);
                 } else {
                     result = await proc.StandardError.ReadToEndAsync().ConfigureAwait(false);
                     exec.Description = result ?? "No error but no return either";
-                    await ctx.RespondAsync(exec).ConfigureAwait(false);
                 }
             } catch (Exception ex) {
                 exec.Description = "You fucked up\n" + string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message);
-                await ctx.RespondAsync(exec).ConfigureAwait(false);
             }
+            await BeginMsg.ModifyAsync(exec.Build());
         }
     }
 }

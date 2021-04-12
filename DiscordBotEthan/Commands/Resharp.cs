@@ -14,8 +14,6 @@ namespace DiscordBotEthan.Commands {
 
         [Command("Resharp"), RequireOwner, Hidden] // Stole from https://github.com/Naamloos/ModCore/blob/master/ModCore/Commands/Eval.cs but I know now to use Microsoft.CodeAnalysis in the future if I need something like this again
         public async Task ResharpCommand(CommandContext ctx, [RemainingText] string code) {
-            var msg = ctx.Message;
-
             var cs1 = code.IndexOf("```") + 3;
             cs1 = code.IndexOf('\n', cs1) + 1;
             var cs2 = code.LastIndexOf("```");
@@ -25,8 +23,8 @@ namespace DiscordBotEthan.Commands {
                 return;
             }
 
-            var cs = code[cs1..cs2];
-            await ctx.RespondAsync("Beginning execution");
+            code = code[cs1..cs2];
+            var BeginMsg = await ctx.RespondAsync("Beginning execution");
 
             DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
                 Title = $"Execution | Returned",
@@ -41,21 +39,19 @@ namespace DiscordBotEthan.Commands {
                 var sopts = ScriptOptions.Default.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.CommandsNext");
                 sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
-                var script = CSharpScript.Create(cs, sopts, typeof(TestVariables));
+                var script = CSharpScript.Create(code, sopts, typeof(TestVariables));
                 script.Compile();
                 var result = await script.RunAsync(globals).ConfigureAwait(false);
 
                 if (result != null && result.ReturnValue != null && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString())) {
                     exec.Description = result.ReturnValue.ToString();
-                    await ctx.RespondAsync(exec).ConfigureAwait(false);
                 } else {
                     exec.Description = "No error but no return either";
-                    await ctx.RespondAsync(exec).ConfigureAwait(false);
                 }
             } catch (Exception ex) {
                 exec.Description = string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message);
-                await ctx.RespondAsync(exec).ConfigureAwait(false);
             }
+            await BeginMsg.ModifyAsync(exec.Build());
         }
 
         public class TestVariables {
