@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 namespace DiscordBotEthan {
 
     internal static class Program {
-        public static readonly ulong BotOwner = 447781010315149333;
         public static readonly string ConnString = $"Data Source={Path.Join("Players", "Players.db")}; Version=3;";
+        public static readonly ulong BotOwner = 447781010315149333;
         public static readonly ulong GuildID = 732774669115064370;
         public static readonly ulong LearnerRole = 734242782092329101;
         public static readonly ulong MutedRole = 765286908133638204;
