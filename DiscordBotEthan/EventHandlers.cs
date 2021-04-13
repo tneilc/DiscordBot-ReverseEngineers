@@ -1,5 +1,6 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using JokinsCommon;
 using Microsoft.Extensions.Logging;
@@ -144,11 +145,7 @@ namespace DiscordBotEthan {
 
                 if (new Random().Next(500) == 1) {
                     using WebClient client = new WebClient();
-
-                    await new DiscordMessageBuilder()
-                        .WithContent(client.DownloadString("https://insult.mattbas.org/api/insult"))
-                        .WithReply(args.Message.Id)
-                        .SendAsync(args.Channel);
+                    await args.Message.RespondAsync(client.DownloadString("https://insult.mattbas.org/api/insult"));
                 }
 
                 string stripped = args.Message.Content.RemoveString(" ", ".").ToLower();
@@ -168,11 +165,7 @@ namespace DiscordBotEthan {
                     await PS.Warn(args.Channel, "Invite Link");
                 } else if (stripped.Contains("nigger") || stripped.Contains("nigga")) {
                     await PS.Warn(args.Channel, "Saying the N-Word");
-
-                    await new DiscordMessageBuilder()
-                        .WithContent("Keep up the racism and you will get banned\nUse nig, nibba instead atleast")
-                        .WithReply(args.Message.Id, true)
-                        .SendAsync(args.Channel);
+                    await args.Message.RespondAsync("Keep up the racism and you will get banned\nUse nig, nibba instead atleast");
                 }
 
                 await PS.Save();
@@ -203,21 +196,20 @@ namespace DiscordBotEthan {
         }
 
         public static async Task Commands_CommandErrored(CommandsNextExtension sender, CommandErrorEventArgs args) {
+            foreach (var failedCheck in ((ChecksFailedException)args.Exception).FailedChecks) {
+                if (failedCheck is BlacklistAttribute) {
+                    await args.Context.RespondAsync("You are on a Blacklist for this Command");
+                    return;
+                }
+            }
+
             switch (args.Exception) {
                 case ArgumentException e:
-
-                    await new DiscordMessageBuilder()
-                        .WithContent($"Idk what the fuck you want to do with that Command (Argument {e.ParamName ?? "unknown"} is faulty)")
-                        .WithReply(args.Context.Message.Id, true)
-                        .SendAsync(args.Context.Channel);
+                    await args.Context.RespondAsync($"Idk what the fuck you want to do with that Command (Argument {e.ParamName ?? "unknown"} is faulty)");
                     break;
 
-                case DSharpPlus.CommandsNext.Exceptions.ChecksFailedException _:
-                    await new DiscordMessageBuilder()
-                        .WithContent("The FBI has been contacted (You don't have the rights for that command)")
-                        .WithReply(args.Context.Message.Id, true)
-                        .SendAsync(args.Context.Channel);
-
+                case ChecksFailedException _:
+                    await args.Context.RespondAsync("The FBI has been contacted (You don't have the rights for that command)");
                     break;
             }
         }

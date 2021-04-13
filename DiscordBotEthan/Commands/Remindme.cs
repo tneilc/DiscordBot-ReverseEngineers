@@ -36,7 +36,7 @@ namespace DiscordBotEthan.Commands {
             _ = Task.Run(async () => {
                 await Task.Delay((int)Time);
 
-                await ctx.RespondAsync($":alarm_clock:, {ctx.Member.Mention} you wanted me to remind you the following:\n\n{What}");
+                await ctx.Channel.SendMessageAsync($":alarm_clock:, {ctx.Member.Mention} you wanted me to remind you the following:\n\n{What}");
                 await Program.SQLC.DeleteRemindersWithDate(dateTime.ToBinary());
             });
         }
@@ -74,7 +74,7 @@ namespace DiscordBotEthan.Commands {
             _ = Task.Run(async () => {
                 await Task.Delay((int)Time);
 
-                await ctx.RespondAsync($":alarm_clock:, {member.Mention} someone wanted me to remind you the following:\n\n{What}");
+                await ctx.Channel.SendMessageAsync($":alarm_clock:, {member.Mention} someone wanted me to remind you the following:\n\n{What}");
                 await Program.SQLC.DeleteRemindersWithDate(dateTime.ToBinary());
             });
         }
