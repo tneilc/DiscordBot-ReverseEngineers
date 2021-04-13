@@ -133,14 +133,14 @@ namespace DiscordBotEthan {
 
                 if (!UsersLastMessages.ContainsKey(args.Author.Id)) {
                     UsersLastMessages.Add(args.Author.Id, new List<string>());
-                } else if (UsersLastMessages[args.Author.Id].Count > 1 && UsersLastMessages[args.Author.Id].Contains(args.Message.Content)) {
+                } else if (UsersLastMessages[args.Author.Id].Count > 1 && UsersLastMessages[args.Author.Id].Contains(args.Message.Content.Trim())) {
                     await PS.Warn(args.Channel, "Spamming");
                     UsersLastMessages[args.Author.Id].Clear();
-                } else if (UsersLastMessages[args.Author.Id].Contains(args.Message.Content)) {
-                    UsersLastMessages[args.Author.Id].Add(args.Message.Content);
+                } else if (UsersLastMessages[args.Author.Id].Contains(args.Message.Content.Trim())) {
+                    UsersLastMessages[args.Author.Id].Add(args.Message.Content.Trim());
                 } else {
                     UsersLastMessages[args.Author.Id].Clear();
-                    UsersLastMessages[args.Author.Id].Add(args.Message.Content);
+                    UsersLastMessages[args.Author.Id].Add(args.Message.Content.Trim());
                 }
 
                 if (new Random().Next(500) == 1) {
