@@ -11,12 +11,12 @@ namespace DiscordBotEthan.Commands {
         public async Task MirrorCommand(CommandContext ctx, [RemainingText] string message) {
             await ctx.Message.DeleteAsync();
             if (ctx.Message.MessageType == DSharpPlus.MessageType.Reply) {
-                _ = await new DiscordMessageBuilder()
+                await new DiscordMessageBuilder()
                     .WithContent(message)
                     .WithReply(ctx.Message.ReferencedMessage.Id, true)
                     .SendAsync(ctx.Channel);
             } else {
-                await ctx.RespondAsync(message);
+                await ctx.Channel.SendMessageAsync(message);
             }
         }
     }

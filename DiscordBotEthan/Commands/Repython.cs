@@ -26,7 +26,7 @@ namespace DiscordBotEthan.Commands {
             code = code[cs1..cs2].Replace("\"", "'");
 
             if (BlacklistedCode.Any(x => code.ToLower().Contains(x))) {
-                await ctx.RespondAsync($"Something doesn't seem right.. <@{Program.BotOwner}> verify this");
+                await ctx.Channel.SendMessageAsync($"Something doesn't seem right.. <@{Program.BotOwner}> verify this");
 
                 var msg = await ctx.Channel.GetNextMessageAsync(x => x.Author.Id == Program.BotOwner);
                 if (!string.Equals(msg.Result.Content, "verified", StringComparison.OrdinalIgnoreCase) || msg.TimedOut) {
