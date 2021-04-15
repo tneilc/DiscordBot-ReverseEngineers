@@ -13,7 +13,6 @@ namespace DiscordBotEthan.Commands {
             if (ctx.Message.MessageType == DSharpPlus.MessageType.Reply) {
                 _ = await new DiscordMessageBuilder()
                     .WithContent(message)
-                    .WithReply(ctx.Message.ReferencedMessage.Id, true)
                     .SendAsync(ctx.Channel);
             } else {
                 await ctx.RespondAsync(message);
