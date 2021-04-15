@@ -52,7 +52,7 @@ namespace DiscordBotEthan.Commands {
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
                 Timestamp = DateTimeOffset.Now
             };
-            await ctx.RespondAsync(embed: Reminder);
+            await ctx.RespondAsync(Reminder);
         }
 
         [Command("add"), Description("Remind someone, something in the future"), RequireUserPermissions(DSharpPlus.Permissions.Administrator)]
@@ -67,7 +67,7 @@ namespace DiscordBotEthan.Commands {
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
                 Timestamp = DateTimeOffset.Now
             };
-            await ctx.RespondAsync(embed: Reminder);
+            await ctx.RespondAsync(Reminder);
 
             await Program.SQLC.AddReminder((long)member.Id, (long)ctx.Channel.Id, dateTime.ToBinary(), What);
 
