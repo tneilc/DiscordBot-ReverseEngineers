@@ -9,7 +9,7 @@ namespace DiscordBotEthan.Commands {
     public class Tag : BaseCommandModule {
 
         [Command("Tag"), Description("Requests a Tag")]
-        public async Task TagCommand(CommandContext ctx, [Description("`highlighting`,`slashcommands`,`lpbaseofdll`,`learnpython`")] string tagtoshow) {
+        public async Task TagCommand(CommandContext ctx, [Description("`highlighting`,`slashcommands`,`lpbaseofdll`,`learnpython`,`intellisense`")] string tagtoshow) {
             switch (tagtoshow.ToLower()) {
                 case "highlighting": {
                         DiscordEmbedBuilder Tags = new DiscordEmbedBuilder {
@@ -98,8 +98,22 @@ https://www.learnpython.org/",
                         break;
                     }
 
+                case "intellisense": {
+                        DiscordEmbedBuilder Tags = new DiscordEmbedBuilder {
+                            Title = "Tag | IntelliSense",
+                            Description = @"​Please. Please PLEASE for the love of god use IntelliSense.
+Your IDE will show you what parameters a method takes, and/or what properties/methods exists for a given object.
+If anything, there's always the documentation.",
+                            Color = Program.EmbedColor,
+                            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
+                            Timestamp = DateTimeOffset.Now
+                        };
+                        await ctx.RespondAsync(embed: Tags);
+                        break;
+                    }
+
                 default:
-                    throw new ArgumentException("Tag not found", "tagtoshow");
+                    throw new ArgumentException("Tag not found", nameof(tagtoshow));
             }
         }
     }
