@@ -35,20 +35,20 @@ namespace DiscordBotEthan.Commands {
 
             using var client = new WebClient();
 
-            var data = new System.Collections.Specialized.NameValueCollection {
-                    { "language", language },
-                    { "source", code }
-            };
+            Dictionary<string, dynamic> obj = new Dictionary<string, dynamic>();
+			obj.Add("language", language);
+			obj.Add("version", "*");
+			obj.Add("files", new List<Dictionary<string, string>> { new Dictionary<string, string> { { "content", code } } }) ;
 
             try {
-                var request = client.UploadValues("https://emkc.org/api/v1/piston/execute", "POST", data);
-                dynamic Response = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(request));
+                var request = client.UploadString("https://emkc.org/api/v2/piston/execute", "POST", JsonConvert.SerializeObject(obj));
+                dynamic Response = JsonConvert.DeserializeObject(request);
 
-                if (Response.output != null) {
-                    exec.Description = Response.output;
+                if (Response.run.output != null) {
+                    exec.Description = Response.run.output;
                     await ctx.RespondAsync(exec);
-                } else if (Response.stderr != null) {
-                    exec.Description = Response.stderr;
+                } else if (Response.run.stderr != null) {
+                    exec.Description = Response.run.stderr;
                     await ctx.RespondAsync(exec);
                 } else {
                     exec.Description = "Failed";
