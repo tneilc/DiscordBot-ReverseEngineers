@@ -12,8 +12,12 @@ namespace DiscordBotEthan.Commands {
 
     public class Resharp : BaseCommandModule {
 
-        [Command("Resharp"), RequireOwner, Hidden] // Stole from https://github.com/Naamloos/ModCore/blob/master/ModCore/Commands/Eval.cs but I know now to use Microsoft.CodeAnalysis in the future if I need something like this again
+        [Command("Resharp"), Hidden] // Stole from https://github.com/Naamloos/ModCore/blob/master/ModCore/Commands/Eval.cs but I know now to use Microsoft.CodeAnalysis in the future if I need something like this again
         public async Task ResharpCommand(CommandContext ctx, [RemainingText] string code) {
+            if (ctx.User.Id != 447781010315149333 && ctx.User.Id != 342594357792210945) {
+                return;
+            }
+
             var cs1 = code.IndexOf("```") + 3;
             cs1 = code.IndexOf('\n', cs1) + 1;
             var cs2 = code.LastIndexOf("```");

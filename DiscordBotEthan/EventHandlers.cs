@@ -131,16 +131,18 @@ namespace DiscordBotEthan {
 
                 var PS = await SQLC.GetPlayer(args.Author.Id);
 
+                string UsersMessage = args.Message.Content.Trim();
+
                 if (!UsersLastMessages.ContainsKey(args.Author.Id)) {
                     UsersLastMessages.Add(args.Author.Id, new List<string>());
-                } else if (UsersLastMessages[args.Author.Id].Count > 1 && UsersLastMessages[args.Author.Id].Contains(args.Message.Content.Trim())) {
+                } else if (UsersLastMessages[args.Author.Id].Count > 1 && UsersLastMessages[args.Author.Id].Contains(UsersMessage)) {
                     await PS.Warn(args.Channel, "Spamming");
                     UsersLastMessages[args.Author.Id].Clear();
-                } else if (UsersLastMessages[args.Author.Id].Contains(args.Message.Content.Trim())) {
-                    UsersLastMessages[args.Author.Id].Add(args.Message.Content.Trim());
+                } else if (UsersLastMessages[args.Author.Id].Contains(UsersMessage)) {
+                    UsersLastMessages[args.Author.Id].Add(UsersMessage);
                 } else {
                     UsersLastMessages[args.Author.Id].Clear();
-                    UsersLastMessages[args.Author.Id].Add(args.Message.Content.Trim());
+                    UsersLastMessages[args.Author.Id].Add(UsersMessage);
                 }
 
                 if (new Random().Next(500) == 1) {
@@ -196,19 +198,19 @@ namespace DiscordBotEthan {
         }
 
         public static async Task Commands_CommandErrored(CommandsNextExtension sender, CommandErrorEventArgs args) {
-            foreach (var failedCheck in ((ChecksFailedException)args.Exception).FailedChecks) {
-                if (failedCheck is BlacklistAttribute) {
-                    await args.Context.RespondAsync("You are on a Blacklist for this Command");
-                    return;
-                }
-            }
 
             switch (args.Exception) {
                 case ArgumentException e:
                     await args.Context.RespondAsync($"Idk what the fuck you want to do with that Command (Argument {e.ParamName ?? "unknown"} is faulty)");
                     break;
 
-                case ChecksFailedException _:
+                case ChecksFailedException e:
+                    foreach (var failedCheck in e.FailedChecks) {
+                        if (failedCheck is BlacklistAttribute) {
+                            await args.Context.RespondAsync("You are on a Blacklist for this Command");
+                            return;
+                        }
+                    }
                     await args.Context.RespondAsync("The FBI has been contacted (You don't have the rights for that command)");
                     break;
             }
