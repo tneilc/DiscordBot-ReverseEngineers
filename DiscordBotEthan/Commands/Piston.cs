@@ -28,7 +28,7 @@ namespace DiscordBotEthan.Commands {
             await ctx.RespondAsync("Beginning execution");
 
             DiscordEmbedBuilder exec = new DiscordEmbedBuilder {
-                Title = $"Piston | Returned",
+                Title = "Piston | Returned",
                 Color = Program.EmbedColor,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Made by JokinAce 😎" },
                 Timestamp = DateTimeOffset.Now
@@ -36,29 +36,29 @@ namespace DiscordBotEthan.Commands {
 
             using var client = new WebClient();
 
-            Dictionary<string, dynamic> obj = new Dictionary<string, dynamic>();
-			obj.Add("language", language);
-			obj.Add("version", "*");
-			obj.Add("files", new List<Dictionary<string, string>> { new Dictionary<string, string> { { "content", code } } }) ;
+            Dictionary<string, dynamic> obj = new Dictionary<string, dynamic> {
+                ["language"] = language,
+                ["version"] = "*",
+                ["files"] = new List<Dictionary<string, string>> { new Dictionary<string, string> { { "content", code } } }
+            };
 
             try {
                 var request = client.UploadString("https://emkc.org/api/v2/piston/execute", "POST", JsonConvert.SerializeObject(obj));
                 dynamic Response = JsonConvert.DeserializeObject(request);
 
-                if (Response.run.output != null) {
-                    exec.Description = Response.run.output;
-                    await ctx.RespondAsync(exec);
+                if (Response.run.stdout != null) {
+                    exec.Description = Response.run.stdout;
                 } else if (Response.run.stderr != null) {
                     exec.Description = Response.run.stderr;
-                    await ctx.RespondAsync(exec);
+                } else if (Response.run.output != null) {
+                    exec.Description = Response.run.output;
                 } else {
                     exec.Description = "Failed";
-                    await ctx.RespondAsync(exec);
                 }
-            } catch (WebException) {
-                exec.Description = "Failed";
-                await ctx.RespondAsync(exec);
+            } catch (WebException e) {
+                exec.Description = "**WebException**: " + e.Message;
             }
+            await ctx.RespondAsync(exec);
         }
     }
 }
