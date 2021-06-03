@@ -36,7 +36,7 @@ namespace DiscordBotEthan.Players {
 
                 if ((Warns.Count + 1) >= 3) {
                     if (!Muted) {
-                        DateTime MuteTime = DateTime.Now.AddHours(1);
+                        DateTime MuteTime = DateTime.Now.AddDays(1);
                         DiscordRole MutedRole = Guild.GetRole(Program.MutedRole);
 
                         await Member.GrantRoleAsync(MutedRole);
@@ -44,7 +44,8 @@ namespace DiscordBotEthan.Players {
 
                         Muted = true;
 
-                        WarnMessage.WithDescription($"**{Member.Mention} has been warned for the following Reason:**\n{reason}\n**Muted: True\nUnmuted on {MuteTime:dd.MM.yyyy HH:mm}**");
+                        WarnMessage.WithDescription($"**{Member.Mention} has been warned for the following Reason:**\n{reason}\n**Muted: True**");
+                        WarnMessage.WithTimestamp(MuteTime);
 
                         _ = Task.Run(async () => {
                             try {
@@ -57,7 +58,7 @@ namespace DiscordBotEthan.Players {
                                 PS.Muted = false;
                                 await PS.Save();
 
-                                await Program.SQLC.DeleteTempmutesWithID((long)Member.Id);
+                                await SQLC.DeleteTempmutesWithID((long)Member.Id);
                                 await Member.RevokeRoleAsync(MutedRole);
                             } catch (Exception) {
                                 discord.Logger.LogInformation($"Failed the Warn Tempmute process for {Member.Username + "#" + Member.Discriminator}");
